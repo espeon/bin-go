@@ -115,7 +115,13 @@ var cmdGet = &cobra.Command{
 			return
 		}
 		defer resp.Body.Close()
+
 		fmt.Println("Response:", resp.Status)
+		_, err = io.Copy(os.Stdout, resp.Body)
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
 	},
 }
 

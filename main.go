@@ -174,16 +174,22 @@ func getHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func deleteHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	id := ps.ByName("slug")
 
+	t := 121
+
 	// check if paste exists
-	if err := db.QueryRow("SELECT id FROM pastes WHERE slug = ?", id).Scan(&id); err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+	if err := db.QueryRow("SELECT id FROM pastes WHERE slug = ?", id).Scan(&t); err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
 	// delete paste from sqlite db
+	// doesn't seem to work? no error, but no rows affected
+	// TODO: fix ASAP
+	println(id)
 	res, err := db.Exec("DELETE FROM pastes WHERE slug = ?", id)
 	if err != nil {
-		panic(err)
+		// handle the error
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	numDeleted, err := res.RowsAffected()
